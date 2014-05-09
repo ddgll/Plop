@@ -16,16 +16,22 @@
 	<!-- Start of first page: #one -->
 	<div data-role="page" id="one">
 
-		<div data-role="header">
+		<div data-role="header" data-position="fixed">
 			<h1>Plop</h1>
 		</div>
 		<!-- /header -->
 
-		<div role="main" class="ui-content" style="text-align: center;">
-			<div class="divActionGame">
-				<button type="button" id="btnCreateGame" data-theme="f" class="ui-btn ui-btn-f ui-corner-all">Start new game</button>
-				<button type="button" id="btnHighScore" data-theme="f" class="ui-btn ui-btn-w ui-corner-all">High Scores</button>
+		<div role="main" class="ui-content">
+			<div style="width: 48%; float: left;">
+				<h3>High Scores</h3>
+				<ul data-role="listview" data-inset="true" id="scoreList"></ul>
 			</div>
+			<div style="width: 48%; float: right;">
+				<a id="btnCreateGame" href="#" data-role="button">Start new game</a>
+			</div>
+		</div>
+		
+		<div data-role="footer" data-position="fixed">
 		</div>
 		<!-- /footer -->
 	</div>
@@ -33,48 +39,19 @@
 	<!-- Start of second page: #two -->
 	<div data-role="page" id="two">
 
-		<div data-role="header" id="header">
-			<a href="javascript:;" class="btnBackMenu" data-icon="back"></a>
+		<div data-role="header">
+			<div style="float: right; margin-right: 10px; display: none;" id="infos">
+				Score: <span id="score">0</span> (x<span id="multiplier">1</span>)
+			</div>
+			<a href="javascript:;" data-action="btnBackMenu" data-icon="back">Menu</a>
 			<h1>Plop</h1>
-			<a href="javascript:;" id="infos">
-				<b>Score:</b> <span id="score">0</span>
-				<b>Multiplier:</b> <span id="multiplier">1</span>
-			</a>
 		</div>
 		<!-- /header -->
 
-		<div role="main" class="ui-content">
-			<canvas id="canvas" style="margin: auto; display: block;">Votre navigateur ne supporte pas HTML5, veuillez le mettre à jour pour jouer.</canvas>
-		</div>
+		<div role="main" class="ui-content" id="plopGame"></div>
 		<!-- /content -->
 	</div>
 	<!-- /page two -->
-
-	<!-- Start of first page: #three -->
-	<div data-role="page" id="three">
-
-		<div data-role="header">
-			<a href="javascript:;" class="btnBackMenu" data-icon="back"></a>
-			<h1>High Scores</h1>
-		</div>
-		<!-- /header -->
-
-		<div role="main" class="ui-content" style="text-align: center;">
-			<select id="levelHS">
-				<option value="beginer" selected>Beginner</option>
-				<option value="intermediate">Intermediate</option>
-				<option value="expert">Expert</option>
-				<option value="insane">Insane</option>
-			</select>
-			<ul data-role="listview" data-inset="true" id="scoreList"></ul>
-		</div>
-
-		<!-- /footer -->
-		<div class="divActionGame">
-			<button type="button" onclick="$.mobile.changePage('#one', {transition : 'slide', 'reverse': true});" data-theme="f" class="ui-btn ui-btn-d ui-corner-all">Back to menu</button>
-		</div>
-	</div>
-	<!-- Start of first page: #three -->
 	
 	<div data-role="dialog" id="winDialog" data-close-btn="right">
 		<div data-role="header">

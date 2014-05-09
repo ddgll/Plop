@@ -4,32 +4,28 @@
 
 map.addBulle(joueur);*/
 var width = 64;
+var drawInterval = null;
+var gameInterval = null;
 function startPlop() {
+	document.getElementById('plopGame').innerHTML = '<canvas id="canvas" style="margin: auto; display: block;">Votre navigateur ne supporte pas HTML5, veuillez le mettre à jour pour jouer.</canvas>';
 	var canvas = document.getElementById('canvas');
 	var ctx = canvas.getContext('2d');
 	
-	var w = window,
-	    d = document,
-	    e = d.documentElement,
-	    g = d.getElementsByTagName('body')[0],
-	    wWidth = w.innerWidth || e.clientWidth || g.clientWidth,
-	    wHeight = w.innerHeight|| e.clientHeight|| g.clientHeight;
-	wHeight -= 50;
-	if(wHeight > wWidth){
-		width = wWidth / 10;
-	}else{
-		width = wHeight / 10;
+	map = new Map("premiere");
+	
+	map.setBackground($(document.body).css('background-color'));
+	
+	if(gameInterval != null){
+		clearInterval(drawInterval);
 	}
-	var map = new Map("premiere", width);
-	
-	canvas.width  = map.getLargeur() * width;
-	canvas.height = map.getHauteur() * width;
-	
-	setInterval(function() {
+	drawInterval = setInterval(function() {
 	    map.dessinerMap(ctx);
 	}, 28);
 	
-	setInterval(function() {
+	if(gameInterval != null){
+		clearInterval(gameInterval);
+	}
+	gameInterval = setInterval(function() {
 		// console.log(map);
 		if(!map.isAnimate() && !map.canPlay()){
 			//console.log('Fini');

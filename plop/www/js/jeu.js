@@ -1,16 +1,8 @@
-var nbLines = 8;
-var nbColumns = 8;
-var nbCases = nbLines * nbColumns;
-var matrice = {};
-var flags = {};
-var nbBombs = 10;//Math.round(nbCases * 0.1);
 var start = null;
 var timer = null;
-var keyDown = false;
-var mode = 'bomb';
-var border = 0;
 var highScores = [];
 var scores = null;
+var map = null;
 
 if (!localStorage) {
 	alert('Your terminal is to old to run Plop');
@@ -36,36 +28,11 @@ $(document).ready(function(){
 $(document).bind("contextmenu", function(e) {
     return false;
 });
-$(document).keydown(function(event){
-	if(keyDown === false){
-		keyDown = 1;
-	}else{
-		keyDown++;
-	}
-});
-$(document).keyup(function(){
-	keyDown--;
-	if(keyDown == 0){
-		keyDown == false;
-	}
-});
 
 $(window).resize(function(){
 	//console.log($.mobile.activePage.attr('id'));
-	if($.mobile.activePage.attr('id') == 'one'){
-		var img = $('#splashImg');
-		img.css('display', 'none');
-		if($(window).width() > $(window).height()){
-			var height = $(window).height() - $('#one .ui-header').height() - $('#level').height() - $('#btnCreateGame').height() - $('#btnHighScore').height() - 30;
-			img.css('height', height + 'px');
-		}else{
-			var width = $(window).width() - 50;
-			img.css('width', width + 'px');
-		}
-		img.css('display', 'block');
-		img.css('margin', 'auto');
-	}else{
-		resizeGame(false);
+	if($.mobile.activePage.attr('id') == 'two'){
+		resizeGame();
 	}
 });
 
@@ -79,11 +46,6 @@ function initJeu(){
 	$('div[data-role="dialog"]').on('pagehide', function(e, ui) {
 	    $(".ui-dialog-background ").removeClass("ui-dialog-background ");
 	});
-	    
-	$('.btnBackMenu').css('border-radius', '15px').css('box-shadow', 'none').css('padding', '15px').css('margin-top', '-2px');
-	$('#infos').css('background-color', '#E9E9E9').css('border', '0').css('box-shadow', 'none');
-	$('#nbBombs').css('background', 'url("img/bomb.png") no-repeat center center #E9E9E9').css('border', '0').css('box-shadow', 'none');
-	$('#timer').css('background-color', '#E9E9E9').css('border', '0').css('box-shadow', 'none');
 	
 	$('.reset').click(function(){
 		startGame();
@@ -92,7 +54,7 @@ function initJeu(){
 	$('#btnCreateGame').click(function(event){
 		event.preventDefault();
 		var level = $('#level :selected');
-		startPlop();
+		startGame();
 	});
 	
 	$('#btnHighScore').click(function(){
@@ -128,18 +90,48 @@ function initJeu(){
 		scores.add(name, $('#finishTime').html(), $('#level').val());
 	});
 	
-	$('.btnBackMenu').click(function(){
+	$('a[data-action="btnBackMenu"]').click(function(){
 		$.mobile.changePage('#one', {transition : 'slide', reverse: true});
 	});
 	
 	if(document.location.hash != '#one'){
 		$.mobile.changePage('#one', {transition : null});
 	}
-	$(window).resize();
+	//$(window).resize();
 };
 
-function resizeGame(reset_){
-	
+function startGame(){
+	if($.mobile.activePage && $.mobile.activePage.attr('id') != 'two'){
+		$.mobile.changePage('#two', {transition : 'slide'});
+		setTimeout(startGame, 500);
+	}else{
+		startPlop();
+		resizeGame();
+	}
+}
+
+function resizeGame(){
+	if(map != null){
+		var w = window,
+	    d = document,
+	    e = d.documentElement,
+	    g = d.getElementsByTagName('body')[0],
+	    wWidth = w.innerWidth || e.clientWidth || g.clientWidth,
+	    wHeight = w.innerHeight|| e.clientHeight|| g.clientHeight;
+
+		wHeight -= $('#two .ui-header').height() + parseInt($('#plopGame').css('padding-top')) * 2 + 10;
+		if(wHeight > wWidth){
+			width = wWidth / map.getLargeur();
+		}else{
+			width = wHeight / map.getLargeur();
+		}
+		
+		$('#infos').css('line-height', $('#two .ui-header').height() + 'px').css('display', 'block');
+		
+		map.setWidth(width);
+		canvas.width  = map.getLargeur() * width;
+		canvas.height = map.getLargeur() * width;
+	}
 }
 
 function addTime(){

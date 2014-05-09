@@ -1,4 +1,4 @@
-function Map(nom, width) {
+function Map(nom) {
     // Création de l'objet XmlHttpRequest
     var xhr = getXMLHttpRequest();
 
@@ -12,11 +12,9 @@ function Map(nom, width) {
     // Analyse des données
     var mapData = JSON.parse(mapJsonData);
     
-    if(width){
-    	this.width = width;
-    }else{
-    	this.width = 32;
-    }
+    this.width = 32;
+    this.background = 'white';
+
     // Tileset
     this.tileset = new Tileset(mapData.tileset);
     this.terrain = mapData.terrain;
@@ -37,6 +35,16 @@ function Map(nom, width) {
 //Pour récupérer la taille (en tiles) de la carte
 Map.prototype.animate = function() {
 	this.animated++;
+}
+
+//Pour récupérer la taille (en tiles) de la carte
+Map.prototype.setWidth = function(width) {
+	this.width = width;
+}
+
+//Pour récupérer la taille (en tiles) de la carte
+Map.prototype.setBackground = function(bkColor) {
+	this.background = bkColor;
 }
 
 //Pour récupérer la taille (en tiles) de la carte
@@ -90,7 +98,7 @@ Map.prototype.dessinerMap = function(context) {
 		for(var j = 0; j < this.getLargeur(); j++){
 			context.beginPath();
 			context.rect(i * this.width, j * this.width, this.width, this.width);
-			context.fillStyle = 'white';
+			context.fillStyle = this.background;
 			context.fill();
 			context.closePath();
 		}
