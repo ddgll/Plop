@@ -32,6 +32,28 @@ function Map(nom) {
     this.multiplier = 1;
 }
 
+Map.prototype.hasNeighbor = function(bulle){
+	var coords = bulle.getCoords();
+	var bottom = this.getBulle({x: coords.x, y: coords.y-1});
+    if(bottom != null && bottom.getColor() == bulle.getColor()){
+    	return true;
+    }
+    var top =  this.getBulle({x: coords.x, y: coords.y+1*1});
+    if(top != null && top.getColor() == bulle.getColor()){
+    	return true;
+    }
+    var right = this.getBulle({x: coords.x+1*1, y: coords.y});
+    if(right != null && right.getColor() == bulle.getColor()){
+    	return true;
+    }
+    var left = this.getBulle({x: coords.x-1, y: coords.y});
+    if(left != null && left.getColor() == bulle.getColor()){
+    	return true;
+    }
+    
+    return false;
+}
+
 //Pour récupérer la taille (en tiles) de la carte
 Map.prototype.animate = function() {
 	this.animated++;
@@ -57,7 +79,7 @@ Map.prototype.unanimate = function() {
 	if(this.animated == 0){
 		this.play = false;
     	for(var i = 0; i < this.bulles.length; i++){
-        	if(this.bulles[i].hasNeighbor()){
+        	if(this.hasNeighbor(this.bulles[i])){
         		this.play = true;
         	}
         }
@@ -94,15 +116,6 @@ Map.prototype.fill = function(){
 }
 // Pour dessiner la carte
 Map.prototype.dessinerMap = function(context) {
-	for(var i = 0; i < this.getHauteur(); i++){
-		for(var j = 0; j < this.getLargeur(); j++){
-			context.beginPath();
-			context.rect(i * this.width, j * this.width, this.width, this.width);
-			context.fillStyle = this.background;
-			context.fill();
-			context.closePath();
-		}
-	}
 	//console.log('Dessin des ' + this.bulles.length + ' bulles');
     for(var i = 0; i < this.bulles.length; i++){
     	this.bulles[i].dessinerBulle(context);
@@ -112,13 +125,7 @@ Map.prototype.dessinerMap = function(context) {
 }
 // Récupérer les coordonnées d'un clic sur la map
 Map.prototype.clickCoord = function(x, y){
-	var coords = {x: Math.floor((x) / this.width), y: Math.floor((y) / this.width)};
-	/*var bulle = this.getBulle(coords);
-	if(bulle != null){
-		bulle.setColor('black');
-	}
-	console.log(coords);*/
-	return coords;
+	return this.getBulle({x: Math.floor((x) / this.width), y: Math.floor((y) / this.width)});
 }
 // Pour ajouter un bulle
 Map.prototype.addBulle = function(perso) {
@@ -129,39 +136,33 @@ Map.prototype.canPlay = function(){
 	return this.play;
 }
 // Pour ajouter un bulle
-Map.prototype.removeBulle = function(coords, noNeighbor) {
-	var bulle = this.getBulle(coords);
-	var remove = 0;
-    if(bulle !== false && (bulle.hasNeighbor() || noNeighbor)){
-    	var indice = this.getBulleIndice(coords);
-    	var bulles = new Array();
-        for(var i = 0; i < this.bulles.length; i++){
-        	if(i == indice){
-        		remove++;
-        		delete this.bulles[i];
-        		this.bulles[i] = new Bulle(coords.x, -1, this);
-        	}
-        }
-        //this.bulles = bulles;
-        
-        var bottom = this.getBulle({x: coords.x, y: coords.y-1});
-        if(bottom != false && bottom.getColor() == bulle.getColor()){
-        	remove += this.removeBulle({x: coords.x, y: coords.y-1}, true);
-        }
-        var top =  this.getBulle({x: coords.x, y: coords.y+1});
-        if(top != false && top.getColor() == bulle.getColor()){
-        	remove += this.removeBulle({x: coords.x, y: coords.y+1}, true);
-        }
-        var right = this.getBulle({x: coords.x+1, y: coords.y});
-        if(right != false && right.getColor() == bulle.getColor()){
-        	remove += this.removeBulle({x: coords.x+1, y: coords.y}, true);
-        }
-        var left = this.getBulle({x: coords.x-1, y: coords.y});
-        if(left != false && left.getColor() == bulle.getColor()){
-        	remove += this.removeBulle({x: coords.x-1, y: coords.y}, true);
-        }
-    }
-    return remove;
+Map.prototype.removeBulle = function(bulle) {
+	if(bulle != null){
+		var remove = 1;
+		var coords = bulle.getCoords();
+		var color = bulle.getColor();
+		bulle.setCoords({x: coords.x, y: -1});
+		bulle.setColor();
+	    remove++;
+	    var tmp = this.getBulle({x: coords.x, y: coords.y-1});// bottom
+	    if(tmp != null && tmp.getColor() == color){
+	    	remove += this.removeBulle(tmp); // bottom
+	    }
+	    var tmp = this.getBulle({x: coords.x, y: coords.y+1*1});// top
+	    if(tmp != null && tmp.getColor() == color){
+	    	remove += this.removeBulle(tmp); // top
+	    }
+	    var tmp = this.getBulle({x: coords.x+1*1, y: coords.y});// right
+	    if(tmp != null && tmp.getColor() == color){
+	    	remove += this.removeBulle(tmp); // right
+	    }
+	    var tmp = this.getBulle({x: coords.x-1, y: coords.y});// left
+	    if(tmp != null && tmp.getColor() == color){
+	    	remove += this.removeBulle(tmp); // left
+	    }
+	    return remove;
+	}
+	return 0;
 }
 
 Map.prototype.calcScore = function(nbRemove_){
@@ -187,7 +188,7 @@ Map.prototype.getBulle = function(coords){
     		return this.bulles[i];
     	}
     }
-	return false;
+	return null;
 }
 
 Map.prototype.getBulleIndice = function(coords){

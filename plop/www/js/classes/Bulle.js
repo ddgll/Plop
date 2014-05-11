@@ -4,7 +4,7 @@ var DIRECTION = {
     "DROITE" : 2,
     "HAUT"   : 3
 };
-var COLORS = ['green', 'blue', 'red', 'pink', 'yellow', 'cyan', 'gray'];
+var COLORS = ['lightgreen', 'red', 'pink', 'yellow', 'cyan', 'lightgray'];
 var DUREE_ANIMATION = 2;
 var DUREE_DEPLACEMENT = 4;
 
@@ -19,7 +19,7 @@ function Bulle(x, y, map, color) {
     if(color){
     	this.color = color;
     }else{
-    	var indice = Math.floor((Math.random() * 7));
+    	var indice = Math.floor((Math.random() * COLORS.length));
     	this.color = COLORS[indice];
     }
     //console.log(indice + '=>' + this.color);
@@ -59,7 +59,7 @@ Bulle.prototype.dessinerBulle = function(context) {
 	    var prochaineCase = this.getCoordonneesAdjacentes(DIRECTION.BAS);
 	    if(prochaineCase.x >= 0 && prochaineCase.y >= 0 && prochaineCase.x < this.map.getLargeur() && prochaineCase.y < this.map.getHauteur()) {
 	        var bulle = this.map.getBulle(prochaineCase);
-	        if(bulle == false){
+	        if(bulle == null){
 	        	this.deplacer(DIRECTION.BAS);
 	        	decalageY = -pixelsAParcourir;
 	        }
@@ -96,38 +96,31 @@ Bulle.prototype.getCoordonneesAdjacentes = function(direction)  {
     return coord;
 }
 
-Bulle.prototype.hasNeighbor = function(){
-	var bottom = this.map.getBulle({x: this.x, y: this.y-1});
-    if(bottom != false && bottom.getColor() == this.getColor()){
-    	return true;
-    }
-    var top =  this.map.getBulle({x: this.x, y: this.y+1});
-    if(top != false && top.getColor() == this.getColor()){
-    	return true;
-    }
-    var right = this.map.getBulle({x: this.x+1, y: this.y});
-    if(right != false && right.getColor() == this.getColor()){
-    	return true;
-    }
-    var left = this.map.getBulle({x: this.x-1, y: this.y});
-    if(left != false && left.getColor() == this.getColor()){
-    	return true;
-    }
-    
-    return false;
-}
-
 //Récupérer les coordonnées d'un clic sur la map
 Bulle.prototype.isAtCoord = function(coords){
-	return this.x == coords.x && this.y == coords.y;
+	return (this.x == coords.x && this.y == coords.y);
 }
 //Récupérer les coordonnées d'un clic sur la map
 Bulle.prototype.getColor = function(){
 	return this.color;
 }
 //Récupérer les coordonnées d'un clic sur la map
+Bulle.prototype.setCoords = function(coords){
+	this.x = coords.x;
+	this.y = coords.y;
+}
+//Récupérer les coordonnées d'un clic sur la map
+Bulle.prototype.getCoords = function(){
+	return {x: this.x, y: this.y};
+}
+//Récupérer les coordonnées d'un clic sur la map
 Bulle.prototype.setColor = function(color){
-	this.color = color;
+	if(color){
+		this.color = color;
+	}else{
+		var indice = Math.floor((Math.random() * COLORS.length));
+    	this.color = COLORS[indice];
+	}
 }
 Bulle.prototype.deplacer = function(direction) {
 	// On ne peut pas se déplacer si un mouvement est déjà en cours !
